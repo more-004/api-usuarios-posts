@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: API de Usuarios y Posts
+  description: API REST robusta en Node.js, Express y PostgreSQL para gestionar usuarios y sus respectivos posts con integridad de datos.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Servidor de Desarrollo Local
+  - url: https://tu-app-railway.up.railway.app
+    description: Servidor de Producción (Railway)
+paths:
+  /api/users:
+    get:
+      summary: Obtiene todos los usuarios
+      responses:
+        '200':
+          description: Lista de usuarios retornada con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Crea un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Usuario creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Error de validación o correo duplicado.
+
+  /api/users/{id}:
+    get:
+      summary: Obtiene un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Datos del usuario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuario no encontrado.
+    put:
+      summary: Actualiza un usuario existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: Usuario actualizado.
+        '400':
+          description: Datos inválidos.
+        '404':
+          description: Usuario no encontrado.
+    delete:
+      summary: Elimina un usuario y todos sus posts asociados (Cascada)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Mensaje de confirmación de eliminación exitosa.
+        '404':
+          description: Usuario no encontrado.
+
+  /api/posts:
+    get:
+      summary: Obtiene todos los posts con información de su autor
+      responses:
+        '200':
+          description: Lista de posts obtenidos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      summary: Crea un nuevo post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '201':
+          description: Post creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '400':
+          description: Datos inválidos o el user_id no existe.
+
+  /api/posts/{id}:
+    get:
+      summary: Obtiene un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles del post.
+        '404':
+          description: Post no encontrado.
+    put:
+      summary: Actualiza un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '200':
+          description: Post actualizado exitosamente.
+        '400':
+          description: Error de validación.
+        '404':
+          description: Post no encontrado.
+    delete:
+      summary: Elimina un post por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Post eliminado exitosamente.
+        '404':
+          description: Post no encontrado.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    UserRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          example: "Juan Pérez"
+        email:
+          type: string
+          example: "juan.perez@example.com"
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        user_id:
+          type: integer
+        author_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    PostRequest:
+      type: object
+      required:
+        - title
+        - content
+        - user_id
+      properties:
+        title:
+          type: string
+          example: "Mi Primer Post"
+        content:
+          type: string
+          example: "Contenido del post..."
+        user_id:
+          type: integer
+          example: 1

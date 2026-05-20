@@ -1,0 +1,11 @@
+# Dependencias de Node
+node_modules/
+
+# Variables de entorno y credenciales locales
+.env
+
+# Archivos de registro del sistema y de npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store

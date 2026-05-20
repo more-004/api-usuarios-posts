@@ -1,0 +1,30 @@
+{
+  "name": "api-usuarios-posts",
+  "version": "1.0.0",
+  "description": "API REST en Node.js, Express y PostgreSQL para gestión de usuarios y posts.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest --runInBand --detectOpenHandles"
+  },
+  "keywords": [
+    "express",
+    "postgres",
+    "api",
+    "rest",
+    "railway"
+  ],
+  "author": "Estudiante",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^6.3.4"
+  }
+}
