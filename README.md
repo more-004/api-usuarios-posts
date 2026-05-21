@@ -39,3 +39,8 @@ api-usuarios-posts/
 ├── openapi.yaml           # Documentación técnica bajo el estándar OpenAPI
 ├── package.json           # Dependencias y scripts del proyecto
 └── server.js              # Configuración y middlewares de la app Express
+
+---
+
+## URL de deploy de Railway 
+https://api-usuarios-posts-production.up.railway.app/api-docs/
