@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:3000
     description: Servidor de Desarrollo Local
-  - url: https://tu-app-railway.up.railway.app
+  - url: https://api-usuarios-posts-production.up.railway.app
     description: Servidor de Producción (Railway)
 paths:
   /api/users:
