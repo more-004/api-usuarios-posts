@@ -1,14 +1,13 @@
-const pool = require('../config/db');
+const pool = require('../db/config');
+const { isNotEmpty, isValidEmail } = require("../utils/validators");
 
 // 1. OBTENER TODOS LOS POSTS (GET) - Incluye el nombre del autor usando JOIN
 const obtenerPosts = async (req, res) => {
     try {
         const consulta = `
-            SELECT posts.id, posts.title, posts.content, posts.created_at, 
-                   usuarios.name AS autor_nombre, usuarios.email AS autor_email
+            SELECT *
             FROM posts
-            INNER JOIN usuarios ON posts.user_id = usuarios.id
-            ORDER BY posts.created_at DESC
+        
         `;
         const resultado = await pool.query(consulta);
         res.status(200).json(resultado.rows);
@@ -22,10 +21,8 @@ const obtenerPostPorId = async (req, res) => {
     const { id } = req.params;
     try {
         const consulta = `
-            SELECT posts.id, posts.title, posts.content, posts.created_at, posts.user_id,
-                   usuarios.name AS autor_nombre
+            SELECT *
             FROM posts
-            INNER JOIN usuarios ON posts.user_id = usuarios.id
             WHERE posts.id = $1
         `;
         const resultado = await pool.query(consulta, [id]);
@@ -42,14 +39,21 @@ const obtenerPostPorId = async (req, res) => {
 
 // 3. CREAR UN NUEVO POST (POST) con validación de Clave Foránea
 const crearPost = async (req, res) => {
+    try {
     const { title, content, user_id } = req.body;
-
-    // Validación básica de campos vacíos
-    if (!title || !content || !user_id) {
-        return res.status(400).json({ mensaje: 'El título, contenido y user_id son obligatorios' });
+    if (!isNotEmpty(title) || !isNotEmpty(content)) {
+      return res.status(400).json({
+        error: "Título y contenido son obligatorios",
+      });
     }
 
-    try {
+    if (!isValidId(author_id)) {
+      return res.status(400).json({
+        error: "author_id inválido",
+      });
+    }
+
+
         // Verificar si el usuario realmente existe antes de asignarle el post
         const usuarioExiste = await pool.query('SELECT * FROM usuarios WHERE id = $1', [user_id]);
         if (usuarioExiste.rows.length === 0) {
@@ -68,14 +72,22 @@ const crearPost = async (req, res) => {
 
 // 4. ACTUALIZAR UN POST (PUT)
 const actualizarPost = async (req, res) => {
+    try {
     const { id } = req.params;
     const { title, content } = req.body;
-
-    if (!title || !content) {
-        return res.status(400).json({ mensaje: 'El título y contenido son obligatorios para actualizar' });
+    
+    if (!isNotEmpty(title) || !isNotEmpty(content)) {
+      return res.status(400).json({
+        error: "Título y contenido son obligatorios",
+      });
     }
 
-    try {
+    if (!isValidId(author_id)) {
+      return res.status(400).json({
+        error: "author_id inválido",
+      });
+    }
+
         const resultado = await pool.query(
             'UPDATE posts SET title = $1, content = $2 WHERE id = $3 RETURNING *',
             [title, content, id]

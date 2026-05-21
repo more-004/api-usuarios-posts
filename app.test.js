@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('./server');
-const { pool } = require('./src/config/db');
+const { pool } = require('./src/db/config');
 
 // Cerramos de manera forzada el pool al terminar
 afterAll(async () => {

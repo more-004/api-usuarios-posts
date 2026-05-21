@@ -1,4 +1,5 @@
-const pool = require('../config/db');
+const pool = require('../db/config');
+const { isNotEmpty, isValidEmail } = require("../utils/validators");
 
 // 1. OBTENER TODOS LOS USUARIOS (GET)
 const obtenerUsuarios = async (req, res) => {
@@ -29,17 +30,18 @@ const obtenerUsuarioPorId = async (req, res) => {
 
 // 3. CREAR UN NUEVO USUARIO (POST)
 const crearUsuario = async (req, res) => {
-    const { name, email } = req.body;
-
-    if (!name || !email) {
-        return res.status(400).json({ mensaje: 'El nombre y el email son obligatorios' });
-    }
-
     try {
-        const existeEmail = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (existeEmail.rows.length > 0) {
-            return res.status(400).json({ mensaje: 'El email ya se encuentra registrado' });
-        }
+    const { name, email } = req.body;
+    
+    if (!isNotEmpty(name) || !isNotEmpty(email)) {
+      return res.status(400).json({ error: "Nombre y email obligatorios" });
+    }
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        error: "Email inválido",
+      });
+    }
+  
 
         const resultado = await pool.query(
             'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *',
@@ -53,14 +55,23 @@ const crearUsuario = async (req, res) => {
 
 // 4. ACTUALIZAR UN USUARIO (PUT)
 const actualizarUsuario = async (req, res) => {
+    try {
     const { id } = req.params;
     const { name, email } = req.body;
 
-    if (!name || !email) {
-        return res.status(400).json({ mensaje: 'El nombre y el email son obligatorios para actualizar' });
+    // Validar email si viene
+    if (email && !isValidEmail(email)) {
+      return res.status(400).json({
+        error: "Email inválido",
+      });
     }
-
-    try {
+// Validar strings vacíos
+    if (name !== undefined && !isNotEmpty(name)) {
+    return res.status(400).json({
+        error: "Nombre inválido",
+    });
+    }
+    
         const resultado = await pool.query(
             'UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *',
             [name, email, id]
